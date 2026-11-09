@@ -1,0 +1,12 @@
+{
+  "name": "air-weather-telegram-bot",
+  "version": "1.0.0",
+  "description": "Telegram bot for checking air quality (WAQI + Open-Meteo), temperature, wind and forecast",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
