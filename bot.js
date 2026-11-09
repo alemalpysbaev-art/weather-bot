@@ -586,27 +586,38 @@ async function geocodeCity(cityName) {
   }
 
   const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cityName)}&count=5&language=ru&format=json`;
-  const res = await fetch(url);
-  const data = await res.json();
-  if (!data.results || data.results.length === 0) return null;
+  try {
+    const res = await fetch(url, { headers: API_HEADERS });
+    const data = await res.json();
+    if (!data.results || data.results.length === 0) return null;
 
-  // Приоритет городам из Казахстана, если есть среди результатов
-  const kzItem = data.results.find(r => r.country_code === 'KZ');
-  const item = kzItem || data.results[0];
-  return {
-    name: item.name,
-    country: item.country || '',
-    admin1: item.admin1 || '',
-    lat: item.latitude,
-    lon: item.longitude
-  };
+    const kzItem = data.results.find(r => r.country_code === 'KZ');
+    const item = kzItem || data.results[0];
+    return {
+      name: item.name,
+      country: item.country || '',
+      admin1: item.admin1 || '',
+      lat: item.latitude,
+      lon: item.longitude
+    };
+  } catch (err) {
+    console.error('Ошибка геокодинга:', err.message);
+    return null;
+  }
 }
 
 // Обратный геокодинг по координатам
 async function reverseGeocode(lat, lon) {
+  const matchedKzByCoords = KZ_CITIES.find(
+    c => Math.abs(c.lat - lat) < 0.08 && Math.abs(c.lon - lon) < 0.08
+  );
+  if (matchedKzByCoords) {
+    return matchedKzByCoords.title;
+  }
+
   try {
     const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=ru`;
-    const res = await fetch(url);
+    const res = await fetch(url, { headers: API_HEADERS });
     const data = await res.json();
     const parts = [data.city || data.locality, data.principalSubdivision, data.countryName].filter(Boolean);
     return parts.length > 0 ? parts.slice(0, 2).join(', ') : `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
@@ -615,7 +626,12 @@ async function reverseGeocode(lat, lon) {
   }
 }
 
-// Запрос всех метео- и эко-данных
+// Запрос всех метео- и эко-данных (с обязательным User-Agent для облачных серверов Render/AWS)
+const API_HEADERS = {
+  'User-Agent': 'SalemWeatherBot/1.0 (https://t.me/Weather_alem_bot; contact@salembot.kz)',
+  'Accept': 'application/json'
+};
+
 async function fetchAllEnvData(lat, lon) {
   const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=temperature_2m,apparent_temperature,wind_speed_10m,wind_gusts_10m,precipitation_probability,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,uv_index_max&wind_speed_unit=ms&timezone=auto&forecast_days=4`;
   const openMeteoAirUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi,european_aqi,pm10,pm2_5,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone,dust,uv_index&timezone=auto`;
@@ -624,10 +640,26 @@ async function fetchAllEnvData(lat, lon) {
     : null;
 
   const [weatherRes, omAirRes, waqiRes] = await Promise.allSettled([
-    fetch(weatherUrl).then(r => r.json()),
-    fetch(openMeteoAirUrl).then(r => r.json()),
-    waqiUrl ? fetch(waqiUrl).then(r => r.json()) : Promise.resolve(null)
+    fetch(weatherUrl, { headers: API_HEADERS }).then(async r => {
+      if (!r.ok) throw new Error(`OpenMeteo weather status ${r.status}`);
+      return r.json();
+    }),
+    fetch(openMeteoAirUrl, { headers: API_HEADERS }).then(async r => {
+      if (!r.ok) throw new Error(`OpenMeteo air status ${r.status}`);
+      return r.json();
+    }),
+    waqiUrl ? fetch(waqiUrl, { headers: API_HEADERS }).then(async r => {
+      if (!r.ok) throw new Error(`WAQI status ${r.status}`);
+      return r.json();
+    }) : Promise.resolve(null)
   ]);
+
+  if (weatherRes.status === 'rejected') {
+    console.error('❌ Ошибка загрузки погоды Open-Meteo:', weatherRes.reason?.message || weatherRes.reason);
+  }
+  if (omAirRes.status === 'rejected') {
+    console.error('❌ Ошибка загрузки качества воздуха CAMS:', omAirRes.reason?.message || omAirRes.reason);
+  }
 
   return {
     weather: weatherRes.status === 'fulfilled' ? weatherRes.value : null,
