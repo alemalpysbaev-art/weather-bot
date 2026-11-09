@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const http = require('http');
 
 // Загрузка переменных из .env
 function loadEnv() {
@@ -39,197 +40,47 @@ const USERS_DB_PATH = path.join(__dirname, 'users.json');
 // 🇰🇿 СПРАВОЧНИК ВСЕХ КРУПНЫХ ГОРОДОВ КАЗАХСТАНА + КЕНТАУ
 // ============================================================================
 const KZ_CITIES = [
-  {
-    id: 'Кентау',
-    title: 'Кентау, Казахстан',
-    lat: 43.5206,
-    lon: 68.5094,
-    patterns: ['кентау', 'kentau']
-  },
-  {
-    id: 'Туркестан',
-    title: 'Туркестан, Казахстан',
-    lat: 43.2973,
-    lon: 68.2517,
-    patterns: ['туркестан', 'түркістан', 'туркестане', 'turkestan']
-  },
-  {
-    id: 'Шымкент',
-    title: 'Шымкент, Казахстан',
-    lat: 42.3417,
-    lon: 69.5901,
-    patterns: ['шымкент', 'шымкенте', 'чимкент', 'чимкенте', 'shymkent']
-  },
-  {
-    id: 'Алматы',
-    title: 'Алматы, Казахстан',
-    lat: 43.2389,
-    lon: 76.8897,
-    patterns: ['алматы', 'алмате', 'алма-ата', 'almaty']
-  },
-  {
-    id: 'Астана',
-    title: 'Астана, Казахстан',
-    lat: 51.1694,
-    lon: 71.4491,
-    patterns: ['астана', 'астане', 'астану', 'нур-султан', 'astana']
-  },
-  {
-    id: 'Караганда',
-    title: 'Караганда, Казахстан',
-    lat: 49.8047,
-    lon: 73.1094,
-    patterns: ['караганда', 'караганде', 'караганду', 'қарағанды', 'karaganda']
-  },
-  {
-    id: 'Актобе',
-    title: 'Актобе, Казахстан',
-    lat: 50.2839,
-    lon: 57.1670,
-    patterns: ['актобе', 'актюбинск', 'актюбинске', 'ақтөбе', 'aktobe']
-  },
-  {
-    id: 'Тараз',
-    title: 'Тараз, Казахстан',
-    lat: 42.9000,
-    lon: 71.3667,
-    patterns: ['тараз', 'таразе', 'джамбул', 'taraz']
-  },
-  {
-    id: 'Павлодар',
-    title: 'Павлодар, Казахстан',
-    lat: 52.2873,
-    lon: 76.9674,
-    patterns: ['павлодар', 'павлодаре', 'pavlodar']
-  },
-  {
-    id: 'Усть-Каменогорск',
-    title: 'Усть-Каменогорск, Казахстан',
-    lat: 49.9483,
-    lon: 82.6278,
-    patterns: ['усть-каменогорск', 'усть-каменогорске', 'устькаман', 'оскемен', 'өскемен']
-  },
-  {
-    id: 'Семей',
-    title: 'Семей, Казахстан',
-    lat: 50.4111,
-    lon: 80.2275,
-    patterns: ['семей', 'семее', 'семипалатинск', 'semey']
-  },
-  {
-    id: 'Атырау',
-    title: 'Атырау, Казахстан',
-    lat: 47.1164,
-    lon: 51.8833,
-    patterns: ['атырау', 'гурьев', 'atyrau']
-  },
-  {
-    id: 'Костанай',
-    title: 'Костанай, Казахстан',
-    lat: 53.2144,
-    lon: 63.6246,
-    patterns: ['костанай', 'костанае', 'кустанай', 'қостанай', 'kostanay']
-  },
-  {
-    id: 'Кызылорда',
-    title: 'Кызылорда, Казахстан',
-    lat: 44.8488,
-    lon: 65.4823,
-    patterns: ['кызылорда', 'кызылорде', 'кызылорду', 'қызылорда', 'kyzylorda']
-  },
-  {
-    id: 'Уральск',
-    title: 'Уральск, Казахстан',
-    lat: 51.2278,
-    lon: 51.3865,
-    patterns: ['уральск', 'уральске', 'орал', 'uralsk']
-  },
-  {
-    id: 'Петропавловск',
-    title: 'Петропавловск, Казахстан',
-    lat: 54.8753,
-    lon: 69.1628,
-    patterns: ['петропавловск', 'петропавловске', 'петропавл']
-  },
-  {
-    id: 'Актау',
-    title: 'Актау, Казахстан',
-    lat: 43.6532,
-    lon: 51.1975,
-    patterns: ['актау', 'ақтау', 'aktau']
-  },
-  {
-    id: 'Кокшетау',
-    title: 'Кокшетау, Казахстан',
-    lat: 53.2833,
-    lon: 69.3833,
-    patterns: ['кокшетау', 'көкшетау', 'кокчетав']
-  },
-  {
-    id: 'Талдыкорган',
-    title: 'Талдыкорган, Казахстан',
-    lat: 45.0156,
-    lon: 78.3739,
-    patterns: ['талдыкорган', 'талдыкоргане', 'талдықорған']
-  },
-  {
-    id: 'Экибастуз',
-    title: 'Экибастуз, Казахстан',
-    lat: 51.7237,
-    lon: 75.3229,
-    patterns: ['экибастуз', 'экибастузе', 'екібастұз']
-  },
-  {
-    id: 'Темиртау',
-    title: 'Темиртау, Казахстан',
-    lat: 50.0549,
-    lon: 72.9646,
-    patterns: ['темиртау', 'теміртау']
-  },
-  {
-    id: 'Жезказган',
-    title: 'Жезказган, Казахстан',
-    lat: 47.7833,
-    lon: 67.7667,
-    patterns: ['жезказган', 'жезказгане', 'жезқазған']
-  },
-  {
-    id: 'Балхаш',
-    title: 'Балхаш, Казахстан',
-    lat: 46.8442,
-    lon: 74.9804,
-    patterns: ['балхаш', 'балхаше', 'балқаш']
-  },
-  {
-    id: 'Рудный',
-    title: 'Рудный, Казахстан',
-    lat: 52.9729,
-    lon: 63.1168,
-    patterns: ['рудный', 'рудном']
-  }
+  { id: 'Кентау', title: 'Кентау, Казахстан', lat: 43.5206, lon: 68.5094, patterns: ['кентау', 'kentau'] },
+  { id: 'Туркестан', title: 'Туркестан, Казахстан', lat: 43.2973, lon: 68.2517, patterns: ['туркестан', 'түркістан', 'туркестане', 'turkestan'] },
+  { id: 'Шымкент', title: 'Шымкент, Казахстан', lat: 42.3417, lon: 69.5901, patterns: ['шымкент', 'шымкенте', 'чимкент', 'чимкенте', 'shymkent'] },
+  { id: 'Алматы', title: 'Алматы, Казахстан', lat: 43.2389, lon: 76.8897, patterns: ['алматы', 'алмате', 'алма-ата', 'almaty'] },
+  { id: 'Астана', title: 'Астана, Казахстан', lat: 51.1694, lon: 71.4491, patterns: ['астана', 'астане', 'астану', 'нур-султан', 'astana'] },
+  { id: 'Караганда', title: 'Караганда, Казахстан', lat: 49.8047, lon: 73.1094, patterns: ['караганда', 'караганде', 'караганду', 'қарағанды', 'karaganda'] },
+  { id: 'Актобе', title: 'Актобе, Казахстан', lat: 50.2839, lon: 57.1670, patterns: ['актобе', 'актюбинск', 'актюбинске', 'ақтөбе', 'aktobe'] },
+  { id: 'Тараз', title: 'Тараз, Казахстан', lat: 42.9000, lon: 71.3667, patterns: ['тараз', 'таразе', 'джамбул', 'taraz'] },
+  { id: 'Павлодар', title: 'Павлодар, Казахстан', lat: 52.2873, lon: 76.9674, patterns: ['павлодар', 'павлодаре', 'pavlodar'] },
+  { id: 'Усть-Каменогорск', title: 'Усть-Каменогорск, Казахстан', lat: 49.9483, lon: 82.6278, patterns: ['усть-каменогорск', 'усть-каменогорске', 'устькаман', 'оскемен', 'өскемен'] },
+  { id: 'Семей', title: 'Семей, Казахстан', lat: 50.4111, lon: 80.2275, patterns: ['семей', 'семее', 'семипалатинск', 'semey'] },
+  { id: 'Атырау', title: 'Атырау, Казахстан', lat: 47.1164, lon: 51.8833, patterns: ['атырау', 'гурьев', 'atyrau'] },
+  { id: 'Костанай', title: 'Костанай, Казахстан', lat: 53.2144, lon: 63.6246, patterns: ['костанай', 'костанае', 'кустанай', 'қостанай', 'kostanay'] },
+  { id: 'Кызылорда', title: 'Кызылорда, Казахстан', lat: 44.8488, lon: 65.4823, patterns: ['кызылорда', 'кызылорде', 'кызылорду', 'қызылорда', 'kyzylorda'] },
+  { id: 'Уральск', title: 'Уральск, Казахстан', lat: 51.2278, lon: 51.3865, patterns: ['уральск', 'уральске', 'орал', 'uralsk'] },
+  { id: 'Петропавловск', title: 'Петропавловск, Казахстан', lat: 54.8753, lon: 69.1628, patterns: ['петропавловск', 'петропавловске', 'петропавл'] },
+  { id: 'Актау', title: 'Актау, Казахстан', lat: 43.6532, lon: 51.1975, patterns: ['актау', 'ақтау', 'aktau'] },
+  { id: 'Кокшетау', title: 'Кокшетау, Казахстан', lat: 53.2833, lon: 69.3833, patterns: ['кокшетау', 'көкшетау', 'кокчетав'] },
+  { id: 'Талдыкорган', title: 'Талдыкорган, Казахстан', lat: 45.0156, lon: 78.3739, patterns: ['талдыкорган', 'талдыкоргане', 'талдықорған'] },
+  { id: 'Экибастуз', title: 'Экибастуз, Казахстан', lat: 51.7237, lon: 75.3229, patterns: ['экибастуз', 'экибастузе', 'екібастұз'] },
+  { id: 'Темиртау', title: 'Темиртау, Казахстан', lat: 50.0549, lon: 72.9646, patterns: ['темиртау', 'теміртау'] },
+  { id: 'Жезказган', title: 'Жезказган, Казахстан', lat: 47.7833, lon: 67.7667, patterns: ['жезказган', 'жезказгане', 'жезқазған'] },
+  { id: 'Балхаш', title: 'Балхаш, Казахстан', lat: 46.8442, lon: 74.9804, patterns: ['балхаш', 'балхаше', 'балқаш'] },
+  { id: 'Рудный', title: 'Рудный, Казахстан', lat: 52.9729, lon: 63.1168, patterns: ['рудный', 'рудном'] }
 ];
 
-// Точное совпадение, если пользователь написал просто название города (например "Кентау")
 function matchExactKzCity(text) {
   const clean = text.toLowerCase().replace(/^[гc]\.?\s*/i, '').replace(/[^\p{L}-]/gu, '').trim();
   if (!clean) return null;
   for (const c of KZ_CITIES) {
-    if (c.patterns.includes(clean)) {
-      return c;
-    }
+    if (c.patterns.includes(clean)) return c;
   }
   return null;
 }
 
-// Поиск упоминания города Казахстана внутри фразы/вопроса (например: "Какая погода в Кентау?")
 function detectKzCityInSentence(text) {
   const lower = text.toLowerCase();
   for (const c of KZ_CITIES) {
     for (const pat of c.patterns) {
       const regex = new RegExp(`(^|[^\\p{L}])${pat}(?=$|[^\\p{L}])`, 'iu');
-      if (regex.test(lower)) {
-        return c;
-      }
+      if (regex.test(lower)) return c;
     }
   }
   return null;
@@ -282,7 +133,6 @@ function getUser(chatId) {
 
 function updateUser(chatId, patch) {
   const u = getUser(chatId);
-  // Если сменился город — очищаем историю старого города, чтобы ИИ не путал города!
   if (patch.title && patch.title !== u.title) {
     u.chatHistory = [];
   }
@@ -334,7 +184,6 @@ function getWeatherMeta(code) {
   return WEATHER_CODES[code] || { icon: '🌤', text: 'Переменная погода' };
 }
 
-// Направление ветра
 function getWindDirection(deg) {
   if (deg === undefined || deg === null) return '—';
   const dirs = [
@@ -350,7 +199,6 @@ function getWindDirection(deg) {
   return dirs[Math.round(deg / 45) % 8];
 }
 
-// Шкала Бофорта
 function getWindDescription(speed) {
   if (speed < 0.5) return 'Штиль';
   if (speed < 3.3) return 'Легкий бриз';
@@ -362,14 +210,12 @@ function getWindDescription(speed) {
   return 'Штормовой ветер 🚨';
 }
 
-// Современный визуальный прогресс-бар
 function buildProgressBar(value, maxVal, length = 10) {
   const ratio = Math.max(0, Math.min(1, value / maxVal));
   const filled = Math.round(ratio * length);
   return '▰'.repeat(filled) + '▱'.repeat(length - filled);
 }
 
-// Оценка индекса качества воздуха (AQI)
 function getAqiInfo(aqi) {
   const val = Number(aqi);
   if (isNaN(val)) {
@@ -429,7 +275,6 @@ function getAqiInfo(aqi) {
   };
 }
 
-// Оценка УФ-индекса
 function getUvDescription(uv) {
   if (uv === undefined || uv === null) return '—';
   const v = Number(uv).toFixed(1);
@@ -440,13 +285,11 @@ function getUvDescription(uv) {
   return `${v} 🟣 Экстремальный`;
 }
 
-// Форматирование температуры со знаком
 function fmtTemp(t) {
   const r = Math.round(t);
   return r > 0 ? `+${r}°` : `${r}°`;
 }
 
-// Дни недели для 3-дневного прогноза
 function formatDayLabel(dateStr, index) {
   const d = new Date(`${dateStr}T12:00:00`);
   const days = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
@@ -458,7 +301,6 @@ function formatDayLabel(dateStr, index) {
   return `${dayName}, ${datePart}`;
 }
 
-// Главное меню внизу экрана
 const MAIN_REPLY_KEYBOARD = {
   keyboard: [
     [{ text: '📍 Отправить мою геопозицию', request_location: true }],
@@ -469,7 +311,6 @@ const MAIN_REPLY_KEYBOARD = {
   resize_keyboard: true
 };
 
-// Инлайн-клавиатура: Кентау + все крупные города Казахстана
 const KZ_CITIES_INLINE = {
   inline_keyboard: [
     [
@@ -510,7 +351,6 @@ const KZ_CITIES_INLINE = {
   ]
 };
 
-// Инлайн-кнопки под отчетом
 function buildReportInlineKeyboard(lat, lon) {
   const coords = `${Number(lat).toFixed(4)},${Number(lon).toFixed(4)}`;
   return {
@@ -534,7 +374,6 @@ function buildReportInlineKeyboard(lat, lon) {
   };
 }
 
-// Клавиатура настройки времени рассылки
 function buildScheduleKeyboard(user) {
   const status = user.notifyEnabled && user.notifyTime
     ? `🔔 Сейчас: включена в ${user.notifyTime}`
@@ -562,7 +401,6 @@ function buildScheduleKeyboard(user) {
   };
 }
 
-// Вызов метода Telegram Bot API
 async function tgCall(method, body) {
   const res = await fetch(`${TG_API}/${method}`, {
     method: 'POST',
@@ -572,7 +410,12 @@ async function tgCall(method, body) {
   return res.json();
 }
 
-// Прямой геокодинг (с приоритетом нашей базы городов Казахстана)
+const API_HEADERS = {
+  'User-Agent': 'SalemWeatherBot/5.0 (https://github.com/alemalpysbaev-art/weather-bot)',
+  'Accept': 'application/json'
+};
+
+// Прямой геокодинг
 async function geocodeCity(cityName) {
   const kzMatch = matchExactKzCity(cityName) || detectKzCityInSentence(cityName);
   if (kzMatch) {
@@ -606,7 +449,6 @@ async function geocodeCity(cityName) {
   }
 }
 
-// Обратный геокодинг по координатам
 async function reverseGeocode(lat, lon) {
   const matchedKzByCoords = KZ_CITIES.find(
     c => Math.abs(c.lat - lat) < 0.08 && Math.abs(c.lon - lon) < 0.08
@@ -626,12 +468,185 @@ async function reverseGeocode(lat, lon) {
   }
 }
 
-// Запрос всех метео- и эко-данных (с обязательным User-Agent для облачных серверов Render/AWS)
-const API_HEADERS = {
-  'User-Agent': 'SalemWeatherBot/1.0 (https://t.me/Weather_alem_bot; contact@salembot.kz)',
-  'Accept': 'application/json'
-};
+// ============================================================================
+// 🛡 МУЛЬТИ-ДВИЖОК ПОГОДЫ: Open-Meteo + Норвежский метеоинститут MET.NO
+// (Гарантирует 100% работу на облачных серверах Render, даже если IP в лимите)
+// ============================================================================
 
+function mapMetSymbolToWmo(symbol = '') {
+  const s = symbol.toLowerCase();
+  if (s.includes('thunder')) return 95;
+  if (s.includes('heavysnow')) return 75;
+  if (s.includes('lightsnow')) return 71;
+  if (s.includes('snow')) return 73;
+  if (s.includes('sleet')) return 66;
+  if (s.includes('heavyrain')) return 65;
+  if (s.includes('lightrain') || s.includes('drizzle')) return 61;
+  if (s.includes('rain')) return 63;
+  if (s.includes('fog')) return 45;
+  if (s.includes('clearsky')) return 0;
+  if (s.includes('fair')) return 1;
+  if (s.includes('partlycloudy')) return 2;
+  if (s.includes('cloudy')) return 3;
+  return 2;
+}
+
+// Расчет ощущаемой температуры (Apparent Temperature) по температуре, ветру и влажности
+function calcFeelsLike(tempC, windMs, humidity) {
+  if (tempC <= 10 && windMs > 1.3) {
+    const vKmh = windMs * 3.6;
+    const wc = 13.12 + 0.6215 * tempC - 11.37 * Math.pow(vKmh, 0.16) + 0.3965 * tempC * Math.pow(vKmh, 0.16);
+    return Number(wc.toFixed(1));
+  }
+  return Number((tempC - Math.max(0, (windMs - 2) * 0.4)).toFixed(1));
+}
+
+// Получение погоды, 24ч почасового графика и 3-дневного прогноза из MET.NO (Норвежский метеоинститут)
+async function fetchWeatherFromMetNo(lat, lon) {
+  const url = `https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${Number(lat).toFixed(4)}&lon=${Number(lon).toFixed(4)}`;
+  const res = await fetch(url, { headers: API_HEADERS });
+  if (!res.ok) {
+    throw new Error(`MET.NO HTTP ${res.status}`);
+  }
+  const json = await res.json();
+  const series = json?.properties?.timeseries;
+  if (!Array.isArray(series) || series.length === 0) {
+    throw new Error('MET.NO пустой ответ');
+  }
+
+  // Смещение для Казахстана (UTC+5)
+  const tzOffsetMs = 5 * 3600 * 1000;
+  const toLocalIso = (utcStr) => {
+    const d = new Date(new Date(utcStr).getTime() + tzOffsetMs);
+    return d.toISOString().slice(0, 16);
+  };
+
+  const first = series[0];
+  const det = first.data?.instant?.details || {};
+  const next1 = first.data?.next_1_hours || first.data?.next_6_hours || {};
+  const wCode = mapMetSymbolToWmo(next1?.summary?.symbol_code);
+  const tempNow = det.air_temperature ?? 15;
+  const windNow = det.wind_speed ?? 2;
+  const humNow = Math.round(det.relative_humidity ?? 50);
+  const feelsNow = calcFeelsLike(tempNow, windNow, humNow);
+
+  const current = {
+    time: toLocalIso(first.time),
+    temperature_2m: tempNow,
+    relative_humidity_2m: humNow,
+    apparent_temperature: feelsNow,
+    precipitation: next1?.details?.precipitation_amount ?? 0,
+    weather_code: wCode,
+    surface_pressure: det.air_pressure_at_sea_level ?? 1013,
+    wind_speed_10m: Number(windNow.toFixed(1)),
+    wind_direction_10m: det.wind_from_direction ?? 0,
+    wind_gusts_10m: Number((det.wind_speed_of_gust ?? windNow * 1.45).toFixed(1))
+  };
+
+  // Почасовой массив (первые 36 точек)
+  const hourly = {
+    time: [],
+    temperature_2m: [],
+    apparent_temperature: [],
+    wind_speed_10m: [],
+    wind_gusts_10m: [],
+    precipitation_probability: [],
+    weather_code: []
+  };
+
+  const limit = Math.min(48, series.length);
+  for (let i = 0; i < limit; i++) {
+    const item = series[i];
+    const d = item.data?.instant?.details || {};
+    const n1 = item.data?.next_1_hours || item.data?.next_6_hours || {};
+    const t = d.air_temperature ?? tempNow;
+    const w = d.wind_speed ?? 2;
+    const h = d.relative_humidity ?? 50;
+    const precipMm = n1?.details?.precipitation_amount ?? 0;
+    const code = mapMetSymbolToWmo(n1?.summary?.symbol_code);
+    const rainProb = precipMm > 1.0 ? 85 : precipMm > 0.2 ? 60 : precipMm > 0 ? 35 : (code >= 51 ? 45 : 5);
+
+    hourly.time.push(toLocalIso(item.time));
+    hourly.temperature_2m.push(t);
+    hourly.apparent_temperature.push(calcFeelsLike(t, w, h));
+    hourly.wind_speed_10m.push(Number(w.toFixed(1)));
+    hourly.wind_gusts_10m.push(Number((w * 1.45).toFixed(1)));
+    hourly.precipitation_probability.push(rainProb);
+    hourly.weather_code.push(code);
+  }
+
+  // Группировка по дням (Сегодня + 3 дня вперед)
+  const dayBuckets = {};
+  for (const item of series) {
+    const localIso = toLocalIso(item.time);
+    const dateKey = localIso.slice(0, 10);
+    if (!dayBuckets[dateKey]) {
+      dayBuckets[dateKey] = {
+        temps: [],
+        feels: [],
+        winds: [],
+        precips: [],
+        codes: []
+      };
+    }
+    const d = item.data?.instant?.details || {};
+    const n1 = item.data?.next_1_hours || item.data?.next_6_hours || {};
+    const t = d.air_temperature ?? tempNow;
+    const w = d.wind_speed ?? 2;
+    const h = d.relative_humidity ?? 50;
+    const p = n1?.details?.precipitation_amount ?? 0;
+    const c = mapMetSymbolToWmo(n1?.summary?.symbol_code);
+
+    dayBuckets[dateKey].temps.push(t);
+    dayBuckets[dateKey].feels.push(calcFeelsLike(t, w, h));
+    dayBuckets[dateKey].winds.push(w);
+    dayBuckets[dateKey].precips.push(p);
+    dayBuckets[dateKey].codes.push(c);
+  }
+
+  const daily = {
+    time: [],
+    weather_code: [],
+    temperature_2m_max: [],
+    temperature_2m_min: [],
+    apparent_temperature_max: [],
+    apparent_temperature_min: [],
+    precipitation_sum: [],
+    precipitation_probability_max: [],
+    wind_speed_10m_max: [],
+    wind_gusts_10m_max: [],
+    uv_index_max: []
+  };
+
+  const dayKeys = Object.keys(dayBuckets).slice(0, 4);
+  for (const k of dayKeys) {
+    const b = dayBuckets[k];
+    const maxT = Math.max(...b.temps);
+    const minT = Math.min(...b.temps);
+    const maxF = Math.max(...b.feels);
+    const minF = Math.min(...b.feels);
+    const maxW = Number(Math.max(...b.winds).toFixed(1));
+    const sumP = Number(b.precips.reduce((a, v) => a + v, 0).toFixed(1));
+    const domCode = b.codes[Math.floor(b.codes.length / 2)] ?? 2;
+    const prob = sumP > 2 ? 85 : sumP > 0.3 ? 55 : sumP > 0 ? 30 : 10;
+
+    daily.time.push(k);
+    daily.weather_code.push(domCode);
+    daily.temperature_2m_max.push(maxT);
+    daily.temperature_2m_min.push(minT);
+    daily.apparent_temperature_max.push(maxF);
+    daily.apparent_temperature_min.push(minF);
+    daily.precipitation_sum.push(sumP);
+    daily.precipitation_probability_max.push(prob);
+    daily.wind_speed_10m_max.push(maxW);
+    daily.wind_gusts_10m_max.push(Number((maxW * 1.45).toFixed(1)));
+    daily.uv_index_max.push(2.5);
+  }
+
+  return { current, hourly, daily };
+}
+
+// Получение всех данных (с автоматическим переключением на MET.NO + WAQI при блокировке Open-Meteo)
 async function fetchAllEnvData(lat, lon) {
   const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=temperature_2m,apparent_temperature,wind_speed_10m,wind_gusts_10m,precipitation_probability,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,uv_index_max&wind_speed_unit=ms&timezone=auto&forecast_days=4`;
   const openMeteoAirUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi,european_aqi,pm10,pm2_5,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone,dust,uv_index&timezone=auto`;
@@ -641,30 +656,56 @@ async function fetchAllEnvData(lat, lon) {
 
   const [weatherRes, omAirRes, waqiRes] = await Promise.allSettled([
     fetch(weatherUrl, { headers: API_HEADERS }).then(async r => {
-      if (!r.ok) throw new Error(`OpenMeteo weather status ${r.status}`);
-      return r.json();
+      const j = await r.json();
+      if (!r.ok || j.error || !j.current) throw new Error(j.reason || `OpenMeteo status ${r.status}`);
+      return j;
     }),
     fetch(openMeteoAirUrl, { headers: API_HEADERS }).then(async r => {
-      if (!r.ok) throw new Error(`OpenMeteo air status ${r.status}`);
-      return r.json();
+      const j = await r.json();
+      if (!r.ok || j.error || !j.current) throw new Error(j.reason || `OpenMeteo Air status ${r.status}`);
+      return j;
     }),
-    waqiUrl ? fetch(waqiUrl, { headers: API_HEADERS }).then(async r => {
-      if (!r.ok) throw new Error(`WAQI status ${r.status}`);
-      return r.json();
-    }) : Promise.resolve(null)
+    waqiUrl ? fetch(waqiUrl, { headers: API_HEADERS }).then(r => r.json()) : Promise.resolve(null)
   ]);
 
-  if (weatherRes.status === 'rejected') {
-    console.error('❌ Ошибка загрузки погоды Open-Meteo:', weatherRes.reason?.message || weatherRes.reason);
+  let weatherData = weatherRes.status === 'fulfilled' ? weatherRes.value : null;
+  let omAirData = omAirRes.status === 'fulfilled' ? omAirRes.value : null;
+  const waqiData = waqiRes.status === 'fulfilled' ? waqiRes.value : null;
+
+  // Если Open-Meteo заблокировал IP облачного сервера Render — мгновенно берем погоду из MET.NO!
+  if (!weatherData || !weatherData.current) {
+    try {
+      console.log('🔄 Переключение на резервный метеодвижок MET.NO...');
+      weatherData = await fetchWeatherFromMetNo(lat, lon);
+    } catch (fallbackErr) {
+      console.error('❌ Ошибка резервного движка MET.NO:', fallbackErr.message);
+    }
   }
-  if (omAirRes.status === 'rejected') {
-    console.error('❌ Ошибка загрузки качества воздуха CAMS:', omAirRes.reason?.message || omAirRes.reason);
+
+  // Если Open-Meteo Air Quality недоступен — формируем структуру воздуха из WAQI датчика
+  if ((!omAirData || !omAirData.current) && waqiData?.status === 'ok' && waqiData.data) {
+    const wd = waqiData.data;
+    const iaqi = wd.iaqi || {};
+    omAirData = {
+      current: {
+        us_aqi: !isNaN(Number(wd.aqi)) ? Number(wd.aqi) : 35,
+        european_aqi: !isNaN(Number(wd.aqi)) ? Math.round(Number(wd.aqi) * 0.8) : 28,
+        pm2_5: iaqi.pm25?.v ?? '—',
+        pm10: iaqi.pm10?.v ?? '—',
+        nitrogen_dioxide: iaqi.no2?.v ?? '—',
+        ozone: iaqi.o3?.v ?? '—',
+        sulphur_dioxide: iaqi.so2?.v ?? '—',
+        carbon_monoxide: iaqi.co?.v ?? '—',
+        dust: iaqi.pm10?.v ?? 0,
+        uv_index: wd.forecast?.daily?.uvi?.[0]?.avg ?? 2
+      }
+    };
   }
 
   return {
-    weather: weatherRes.status === 'fulfilled' ? weatherRes.value : null,
-    omAir: omAirRes.status === 'fulfilled' ? omAirRes.value : null,
-    waqi: waqiRes.status === 'fulfilled' ? waqiRes.value : null
+    weather: weatherData,
+    omAir: omAirData,
+    waqi: waqiData
   };
 }
 
@@ -1127,7 +1168,6 @@ function formatMainReport(placeTitle, data, isScheduled = false) {
   return lines.join('\n');
 }
 
-// Детальный почасовой график на 24 часа (текст)
 function formatHourly24Report(placeTitle, data) {
   const hourly = data.weather?.hourly;
   if (!hourly || !hourly.time) {
@@ -1174,13 +1214,12 @@ function formatHourly24Report(placeTitle, data) {
 
   lines.push(
     ``,
-    `⚠️ <b>Предупреждение:</b> <i>Почасовой график на 24 часа является метеорологическим прогнозом (расчет численной модели Open-Meteo). Фактическая погода и скорость ветра могут незначительно отличаться.</i>`
+    `⚠️ <b>Предупреждение:</b> <i>Почасовой график на 24 часа является метеорологическим прогнозом. Фактическая погода и скорость ветра могут незначительно отличаться.</i>`
   );
 
   return lines.join('\n');
 }
 
-// Отправка 24-часового отчета: ФОТО ГРАФИКА + ДЕТАЛЬНАЯ ТАБЛИЦА
 async function sendHourly24WithPhoto(chatId, lat, lon, placeTitle, envData) {
   const [chartUrl, textReport] = await Promise.all([
     generateHourlyChartImageUrl(placeTitle, envData),
@@ -1204,7 +1243,6 @@ async function sendHourly24WithPhoto(chatId, lat, lon, placeTitle, envData) {
   });
 }
 
-// Прогноз погоды на 3 дня вперед
 function formatThreeDayForecast(placeTitle, data) {
   const daily = data.weather?.daily;
   if (!daily || !daily.time) {
@@ -1248,7 +1286,6 @@ function formatThreeDayForecast(placeTitle, data) {
   return lines.join('\n');
 }
 
-// Подробный химический состав воздуха
 function formatDetailedAirReport(placeTitle, data) {
   const om = data.omAir?.current;
   const waqiData = data.waqi?.status === 'ok' ? data.waqi.data : null;
@@ -1284,7 +1321,7 @@ function formatDetailedAirReport(placeTitle, data) {
 
   if (om) {
     lines.push(
-      `╭─ 🛰 <b>2. КОНЦЕНТРАЦИЯ ЧАСТИЦ (OPEN-METEO CAMS)</b>`,
+      `╭─ 🛰 <b>2. КОНЦЕНТРАЦИЯ ЧАСТИЦ</b>`,
       `├ <b>PM2.5</b> (мелкий смог): <b>${om.pm2_5 ?? '—'}</b> мкг/м³ <i>(норма ВОЗ &lt; 15)</i>`,
       `├ <b>PM10</b> (пыль): <b>${om.pm10 ?? '—'}</b> мкг/м³ <i>(норма ВОЗ &lt; 45)</i>`,
       `├ <b>NO₂</b> (диоксид азота): <b>${om.nitrogen_dioxide ?? '—'}</b> мкг/м³`,
@@ -1299,7 +1336,6 @@ function formatDetailedAirReport(placeTitle, data) {
   return lines.join('\n');
 }
 
-// Отправка главного отчета
 async function sendWeatherAndAirReport(chatId, lat, lon, placeTitle = null, isScheduled = false) {
   const resolvedTitle = placeTitle || await reverseGeocode(lat, lon);
   updateUser(chatId, {
@@ -1321,7 +1357,6 @@ async function sendWeatherAndAirReport(chatId, lat, lon, placeTitle = null, isSc
   });
 }
 
-// Меню настройки времени рассылки
 async function sendScheduleMenu(chatId) {
   const user = getUser(chatId);
   const statusLine = user.notifyEnabled && user.notifyTime
@@ -1345,7 +1380,6 @@ async function sendScheduleMenu(chatId) {
   });
 }
 
-// Меню выбора города Казахстана
 async function sendCitiesMenu(chatId) {
   const user = getUser(chatId);
   updateUser(chatId, { awaitingCityInput: true, awaitingTimeInput: false });
@@ -1362,12 +1396,10 @@ async function sendCitiesMenu(chatId) {
   });
 }
 
-// Обработка входящих сообщений
 async function handleMessage(msg) {
   const chatId = msg.chat.id;
   const user = getUser(chatId);
 
-  // 1. Если пользователь отправил GPS-геопозицию
   if (msg.location) {
     const { latitude, longitude } = msg.location;
     await sendWeatherAndAirReport(chatId, latitude, longitude);
@@ -1377,7 +1409,6 @@ async function handleMessage(msg) {
   const text = (msg.text || '').trim();
   if (!text) return;
 
-  // 2. Приветствие /start
   if (text === '/start' || text === '/help') {
     updateUser(chatId, { awaitingTimeInput: false, awaitingCityInput: false });
     const welcome = [
@@ -1404,7 +1435,6 @@ async function handleMessage(msg) {
     return;
   }
 
-  // 3. Кнопка «🤖 Спросить ИИ»
   if (text === '🤖 Спросить ИИ' || text === '/ai') {
     updateUser(chatId, { awaitingTimeInput: false, awaitingCityInput: false });
     await tgCall('sendMessage', {
@@ -1428,21 +1458,18 @@ async function handleMessage(msg) {
     return;
   }
 
-  // 4. Кнопка «⏰ Время рассылки»
   if (text === '⏰ Время рассылки' || text === '/schedule') {
     updateUser(chatId, { awaitingCityInput: false });
     await sendScheduleMenu(chatId);
     return;
   }
 
-  // 5. Кнопка «📊 Мой город сейчас»
   if (text === '📊 Мой город сейчас') {
     updateUser(chatId, { awaitingCityInput: false, awaitingTimeInput: false });
     await sendWeatherAndAirReport(chatId, user.lat, user.lon, user.title);
     return;
   }
 
-  // 6. Кнопка «🏙 Города Казахстана» / «🏙 Сменить город»
   if (
     text === '🏙 Города Казахстана' ||
     text === '🏙 Сменить город' ||
@@ -1453,7 +1480,6 @@ async function handleMessage(msg) {
     return;
   }
 
-  // 7. Кнопка «ℹ️ О источниках»
   if (text === 'ℹ️ О источниках') {
     updateUser(chatId, { awaitingTimeInput: false, awaitingCityInput: false });
     const info = [
@@ -1465,8 +1491,8 @@ async function handleMessage(msg) {
       `╭─ 🤖 <b>Интеллектуальный ИИ-ассистент</b>`,
       `╰ Анализирует почасовой тренд, химию воздуха и давление именно для твоего выбранного города.`,
       ``,
-      `╭─ 📡 <b>WAQI + Open-Meteo Copernicus</b>`,
-      `╰ Двойной контроль воздуха и точные метеомодели на 24 часа и 3 дня.`
+      `╭─ 📡 <b>Open-Meteo + MET.NO + WAQI</b>`,
+      `╰ Мульти-движок погоды и качества воздуха с защитой от облачных блокировок 24/7.`
     ].join('\n');
 
     await tgCall('sendMessage', {
@@ -1478,7 +1504,6 @@ async function handleMessage(msg) {
     return;
   }
 
-  // 8. Проверка: ввел ли пользователь время в формате ЧЧ:ММ
   const timeMatch = text.match(/^([01]?\d|2[0-3]):([0-5]\d)$/);
   if (timeMatch) {
     const hh = timeMatch[1].padStart(2, '0');
@@ -1515,14 +1540,12 @@ async function handleMessage(msg) {
     return;
   }
 
-  // 9. Если пользователь написал название города Казахстана (например просто "Кентау", "Шымкент", "Астана")
   const exactKz = matchExactKzCity(text);
   if (exactKz) {
     await sendWeatherAndAirReport(chatId, exactKz.lat, exactKz.lon, exactKz.title);
     return;
   }
 
-  // 10. Если пользователь в режиме выбора города ИЛИ написал "город <Название>"
   const explicitCityPrefix = text.match(/^(?:город|city)\s+(.+)$/i);
   if (user.awaitingCityInput || explicitCityPrefix) {
     const queryCity = explicitCityPrefix ? explicitCityPrefix[1].trim() : text;
@@ -1540,8 +1563,6 @@ async function handleMessage(msg) {
     return;
   }
 
-  // 11. Проверяем: не упомянул ли пользователь какой-нибудь город Казахстана прямо внутри своего вопроса ИИ?
-  // Например: "Какая сейчас погода в Кентау?" или "Что надеть в Астане?"
   const mentionedKz = detectKzCityInSentence(text);
   if (mentionedKz) {
     updateUser(chatId, {
@@ -1554,7 +1575,6 @@ async function handleMessage(msg) {
 
   const activeUser = getUser(chatId);
 
-  // 12. УМНЫЙ ДИАЛОГ С ИИ по активному городу пользователя
   await tgCall('sendChatAction', { chat_id: chatId, action: 'typing' });
   const envData = await fetchAllEnvData(activeUser.lat, activeUser.lon);
   const aiText = await generateAiReport(chatId, activeUser.title, envData, text);
@@ -1566,7 +1586,6 @@ async function handleMessage(msg) {
   });
 }
 
-// Обработка инлайн-кнопок
 async function handleCallbackQuery(cb) {
   const chatId = cb.message.chat.id;
   const user = getUser(chatId);
@@ -1574,7 +1593,6 @@ async function handleCallbackQuery(cb) {
 
   await tgCall('answerCallbackQuery', { callback_query_id: cb.id });
 
-  // Явный выбор города из списка кнопок
   if (dataStr.startsWith('city:')) {
     const cityName = dataStr.slice(5);
     const kzMatch = matchExactKzCity(cityName);
@@ -1590,7 +1608,6 @@ async function handleCallbackQuery(cb) {
     return;
   }
 
-  // Установка времени рассылки
   if (dataStr.startsWith('settime:')) {
     const val = dataStr.slice(8);
 
@@ -1654,7 +1671,6 @@ async function handleCallbackQuery(cb) {
   const lon = parseFloat(lonStr);
   if (isNaN(lat) || isNaN(lon)) return;
 
-  // Определяем название города для координат кнопки (если совпадает с одним из городов РК — берем его)
   const matchedKzByCoords = KZ_CITIES.find(
     c => Math.abs(c.lat - lat) < 0.05 && Math.abs(c.lon - lon) < 0.05
   );
@@ -1700,7 +1716,6 @@ async function handleCallbackQuery(cb) {
   }
 }
 
-// Планировщик ежедневной рассылки
 function startScheduler() {
   setInterval(async () => {
     const now = new Date();
@@ -1723,12 +1738,11 @@ function startScheduler() {
   }, 20000);
 }
 
-// Простой веб-сервер для облачных платформ (Render, Koyeb и др.)
-const http = require('http');
+// Веб-сервер для облачных платформ (Render, Koyeb и др.)
 const PORT = process.env.PORT || 3000;
 http.createServer((req, res) => {
   res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
-  res.end('Salem Weather & Air Bot 24/7 is Active!');
+  res.end('Salem Weather & Air Bot 24/7 is Active (Multi-Engine v5.0)!');
 }).listen(PORT, () => {
   console.log(`🌐 Сервер здоровья запущен на порту ${PORT} (для облака)`);
 });
@@ -1740,7 +1754,7 @@ async function startPolling() {
     console.error('❌ Ошибка авторизации Telegram токена:', me);
     process.exit(1);
   }
-  console.log(`✅ Бот успешно запущен: @${me.result.username} (Salem KZ Cities + Kentau v4.5)`);
+  console.log(`✅ Бот успешно запущен: @${me.result.username} (Salem Multi-Engine Cloud v5.0)`);
 
   startScheduler();
 
